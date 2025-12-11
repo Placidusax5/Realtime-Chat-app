@@ -14,11 +14,18 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3001;
-const databaseURL = process.env.DATABASE_URL;
+const databaseURL = process.env.DATABASE_URL || "mongodb://127.0.0.1:27017/realtime-chat-app";
+
+if (!process.env.DATABASE_URL) {
+  console.warn(
+    "Warning: DATABASE_URL is not set in environment. Using fallback:",
+    databaseURL
+  );
+}
 
 app.use(
   cors({
-    origin: [process.env.ORIGIN],
+    origin: [process.env.ORIGIN || "http://localhost:5173"],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
   })

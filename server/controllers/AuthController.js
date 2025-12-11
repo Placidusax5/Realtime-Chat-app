@@ -37,11 +37,13 @@ export const signup = async (request, response, next) => {
       password: hashedPassword,
       salt: salt, // Store the salt for later use in password comparison
     });
-    response.cookie("jwt", createToken(email, user.id), {
+    const cookieOptions = {
       maxAge,
-      secure: true,
-      sameSite: "None",
-    });
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+    };
+
+    response.cookie("jwt", createToken(email, user.id), cookieOptions);
     return response.status(201).json({
       user: {
         id: user.id,
@@ -78,11 +80,13 @@ export const login = async (request, response, next) => {
       return response.status(400).json({ error: "Incorrect password" });
     }
 
-    response.cookie("jwt", createToken(email, user.id), {
+    const cookieOptions = {
       maxAge,
-      secure: true,
-      sameSite: "None",
-    });
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+    };
+
+    response.cookie("jwt", createToken(email, user.id), cookieOptions);
     return response.status(200).json({
       user: {
         id: user.id,
@@ -213,11 +217,13 @@ export const updateProfile = async (request, response, next) => {
 
 export const logout = async (request, response, next) => {
   try {
-    response.cookie("jwt", "", {
+    const cookieOptions = {
       maxAge: 1,
-      secure: true,
-      sameSite: "None",
-    });
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+    };
+
+    response.cookie("jwt", "", cookieOptions);
 
     return response.status(200).json({
       message: "Logged out successfully",

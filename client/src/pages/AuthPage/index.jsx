@@ -45,25 +45,30 @@ const AuthPage = () => {
   const handleLogin = async (event) => {
     event.preventDefault();
     if (validateLogin()) {
-      const response = await apiClient.post(
-        LOGIN_ROUTE,
-        {
-          email,
-          password,
-        },
-        { withCredentials: true }
-      );
-      if (response.data.user.id) {
-        setUserInfo(response.data.user);
-        if (response.data.user.profileSetup) {
-          navigate("/chat");
-        } else {
-          navigate("/profile");
+      try {
+        const response = await apiClient.post(
+          LOGIN_ROUTE,
+          {
+            email,
+            password,
+          },
+          { withCredentials: true }
+        );
+        if (response.data.user.id) {
+          setUserInfo(response.data.user);
+          if (response.data.user.profileSetup) {
+            navigate("/chat");
+          } else {
+            navigate("/profile");
+          }
+          setActiveIcon("chat");
         }
-        setActiveIcon("chat");
-      }
 
-      toast.success("Login successful");
+        toast.success("Login successful");
+      } catch (error) {
+        const message = error?.response?.data?.error || error.message || "Login failed";
+        toast.error(message);
+      }
     }
   };
 
@@ -71,20 +76,25 @@ const AuthPage = () => {
     event.preventDefault();
     if (validateSignup()) {
       console.log("validation successful");
-      const response = await apiClient.post(
-        SIGNUP_ROUTE,
-        {
-          email,
-          password,
-        },
-        { withCredentials: true }
-      );
-      if (response.status === 201) {
-        setUserInfo(response.data.user);
-        navigate("/profile");
-      }
+      try {
+        const response = await apiClient.post(
+          SIGNUP_ROUTE,
+          {
+            email,
+            password,
+          },
+          { withCredentials: true }
+        );
+        if (response.status === 201) {
+          setUserInfo(response.data.user);
+          navigate("/profile");
+        }
 
-      toast.success("Signup successful");
+        toast.success("Signup successful");
+      } catch (error) {
+        const message = error?.response?.data?.error || error.message || "Signup failed";
+        toast.error(message);
+      }
     }
   };
 
